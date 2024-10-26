@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import TapToEarnTab from "../components/TapToEarnTab";
+import Dashboard from "../components/Dashboard";
 import WalletPage from "../components/wallet-tab";
 import { useInitData, User } from "@telegram-apps/sdk-react";
 import Image from "next/image";
@@ -27,7 +27,6 @@ const Home: React.FC = () => {
           : 0;
 
         setUser(initData.user);
-        console.log(initData.user);
 
         const userPayload = {
           uid: initData.user.id,
@@ -36,8 +35,9 @@ const Home: React.FC = () => {
           username: initData.user.username || "Unknown",
           referrer_uid: referrerUid,
           is_premium: initData.user.isPremium || false,
-          wallet_address: "", // Assuming you want to keep this empty for now
+          wallet_address: "", // Assuming empty for now
         };
+
         await authenticateUser(userPayload);
       }
     };
@@ -50,8 +50,8 @@ const Home: React.FC = () => {
       id: "cryptolink",
       text: "Cryptolink",
       Icon: () => (
-        <div className='w-7'>
-          <Image src='/coin.png' alt='' width={100} height={100} priority />
+        <div className="w-7">
+          <Image src="/coin.png" alt="" width={100} height={100} priority />
         </div>
       ),
     },
@@ -59,26 +59,26 @@ const Home: React.FC = () => {
       id: "tapToEarn",
       text: "Earn",
       Icon: () => (
-        <div className='w-7'>
-          <Image src='/earn.svg' alt='' width={100} height={100} priority />
+        <div className="w-7">
+          <Image src="/earn.svg" alt="" width={100} height={100} priority />
         </div>
       ),
     },
-     {
+    {
       id: "invite",
       text: "Invite",
-       Icon: () => (
-         <div className='w-7'>
-           <Image src='/axe.svg' alt='' width={100} height={100} priority />
-         </div>
-       ),
-     },
+      Icon: () => (
+        <div className="w-7">
+          <Image src="/axe.svg" alt="" width={100} height={100} priority />
+        </div>
+      ),
+    },
     {
       id: "wallet",
       text: "Wallet",
       Icon: () => (
-        <div className='w-7'>
-          <Image src='/wallet.png' alt='' width={100} height={100} priority />
+        <div className="w-7">
+          <Image src="/wallet.png" alt="" width={100} height={100} priority />
         </div>
       ),
     },
@@ -86,8 +86,8 @@ const Home: React.FC = () => {
       id: "investor",
       text: "Investor",
       Icon: () => (
-        <div className='w-7'>
-          <Image src='/invest.png' alt='' width={100} height={100} priority />
+        <div className="w-7">
+          <Image src="/invest.png" alt="" width={100} height={100} priority />
         </div>
       ),
     },
@@ -96,11 +96,11 @@ const Home: React.FC = () => {
   const renderTabContent = () => {
     switch (currentTab) {
       case "cryptolink":
-        return <TapToEarnTab user={user} />;
+        return <Dashboard user={user} />;
       case "tapToEarn":
         return <EarnTasks />;
-       case "invite":
-         return <ReferralTab user={user} />;
+      case "invite":
+        return <ReferralTab user={user} />;
       case "wallet":
         return <WalletPage user={user} />;
       case "investor":
@@ -124,26 +124,22 @@ const Home: React.FC = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className='tab-content bg-[#232e3c] text-white'>
+      <div className="tab-content bg-[#232e3c] text-white">
         {renderTabContent()}
-        <div className='w-[96%] flex justify-around bg-[#2A522B] bg-opacity-50 backdrop-blur-sm rounded-lg p-4 fixed bottom-0 left-[2%]'>
+        <div className="w-[96%] flex justify-around bg-[#2A522B] bg-opacity-50 backdrop-blur-sm rounded-lg p-4 fixed bottom-0 left-[2%]">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
               className={`flex items-center justify-center flex-col text-white gap-1 ${
                 currentTab === tab.id ? "" : "opacity-50"
-              }`}>
+              }`}
+            >
               <tab.Icon />
-              <span className='text-xs mt-1'>{tab.text}</span>
+              <span className="text-xs mt-1">{tab.text}</span>
             </button>
           ))}
         </div>
-        {/* {loadingStage < 3 && (
-          <div className='loading-bar'>
-          <div className='progress' style={{ width: `${progress}%` }}></div>
-          </div>
-          )} */}
       </div>
     </QueryClientProvider>
   );
