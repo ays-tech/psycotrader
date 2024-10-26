@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Dashboard from "../components/Dashboard";
-import WalletPage from "../components/wallet-tab";
 import { useInitData, User } from "@telegram-apps/sdk-react";
 import Image from "next/image";
 import EarnTasks from "@/components/earn-tasks";
@@ -74,15 +73,6 @@ const Home: React.FC = () => {
       ),
     },
     {
-      id: "wallet",
-      text: "Wallet",
-      Icon: () => (
-        <div className="w-7">
-          <Image src="/wallet.png" alt="" width={100} height={100} priority />
-        </div>
-      ),
-    },
-    {
       id: "investor",
       text: "Investor",
       Icon: () => (
@@ -101,8 +91,6 @@ const Home: React.FC = () => {
         return <EarnTasks />;
       case "invite":
         return <ReferralTab user={user} />;
-      case "wallet":
-        return <WalletPage user={user} />;
       case "investor":
         return <InvestorTab user={user} />;
       default:

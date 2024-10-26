@@ -57,7 +57,7 @@ export default function Dashboard({ user }) {
       {/* Trading Mindset */}
       <div className="mt-8">
         <h3 className="text-lg font-semibold text-slate-300">Trading Mindset Reminder</h3>
-        <p className="text-sm text-slate-400 mt-3">"Discipline is the key to successful trading. Stay focused on your goals."</p>
+        <p className="text-sm text-slate-400 mt-3">Discipline is the key to successful trading. Stay focused on your goals.</p>
       </div>
 
       {/* Coin and Boost Buttons */}
