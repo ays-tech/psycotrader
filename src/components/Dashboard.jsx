@@ -2,7 +2,7 @@ import { LinearProgress } from "@mui/material";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Line } from 'react-chartjs-2';
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; // Import CircularProgressbar
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import {
   Chart,
   CategoryScale,
@@ -39,7 +39,7 @@ export default function Dashboard({ user }) {
   const userGoalProgress = (points / 1000) * 100;
 
   return (
-    <div className="h-auto flex flex-col justify-between overflow-auto px-4 py-5 bg-gray-900 text-white sm:px-6 lg:px-8">
+    <div className="h-auto flex flex-col justify-between overflow-auto p-5 bg-gray-900 text-white sm:px-6 lg:px-8">
       {/* Header */}
       <div className="flex flex-col items-start mb-6">
         <div className="flex items-center w-full bg-[#002247] rounded-lg py-4 px-4">
@@ -50,34 +50,41 @@ export default function Dashboard({ user }) {
         </div>
       </div>
 
-      {/* Performance Chart */}
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold text-slate-300">Trading Performance</h3>
-        <div className="bg-[#1a202c] rounded-lg p-4 shadow-md">
-          <Line data={performanceData} options={{ responsive: true }} />
-        </div>
+      {/* Trading Mindset */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-slate-300">Trading Mindset Reminder</h3>
+        <p className="text-sm text-slate-400 mt-3">Discipline is the key to successful trading. Stay focused on your goals.</p>
       </div>
 
-      {/* Goal Progress */}
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold text-slate-300">Current Goal</h3>
-        <p className="text-sm text-slate-400">Your progress towards achieving your goal</p>
-        <div className="flex items-center justify-center mt-4">
-          <div style={{ width: 100, height: 100 }}>
-            <CircularProgressbar
-              value={userGoalProgress}
-              text={`${Math.round(userGoalProgress)}%`}
-              styles={buildStyles({
-                pathColor: '#4caf50', // Green color for the progress
-                textColor: '#fff', // Text color
-                trailColor: '#3e3e3e', // Background circle color
-              })}
-            />
-          </div>
+      {/* Grid Layout for Performance and Goal Progress */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Performance Chart */}
+        <div className="bg-[#1a202c] rounded-lg p-4 shadow-md">
+          <h3 className="text-lg font-semibold text-slate-300">Trading Performance</h3>
+          <Line data={performanceData} options={{ responsive: true }} />
         </div>
-        <div className="flex justify-between mt-2">
-          <span className="text-sm text-slate-400">0 XP</span>
-          <span className="text-sm text-slate-400">1000 XP</span>
+
+        {/* Goal Progress */}
+        <div className="flex flex-col items-center justify-center bg-[#1a202c] rounded-lg p-4 shadow-md">
+          <h3 className="text-lg font-semibold text-slate-300">Current Goal</h3>
+          <p className="text-sm text-slate-400">Your progress towards achieving your goal</p>
+          <div className="flex items-center justify-center mt-4">
+            <div style={{ width: 100, height: 100 }}>
+              <CircularProgressbar
+                value={userGoalProgress}
+                text={`${Math.round(userGoalProgress)}%`}
+                styles={buildStyles({
+                  pathColor: '#4caf50',
+                  textColor: '#fff',
+                  trailColor: '#3e3e3e',
+                })}
+              />
+            </div>
+          </div>
+          <div className="flex justify-between mt-2 w-full">
+            <span className="text-sm text-slate-400">0 XP</span>
+            <span className="text-sm text-slate-400">1000 XP</span>
+          </div>
         </div>
       </div>
 
@@ -93,12 +100,6 @@ export default function Dashboard({ user }) {
             <span className="text-green-400">Buy Signal</span>
           </div>
         </div>
-      </div>
-
-      {/* Trading Mindset */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold text-slate-300">Trading Mindset Reminder</h3>
-        <p className="text-sm text-slate-400 mt-3">Discipline is the key to successful trading. Stay focused on your goals.</p>
       </div>
     </div>
   );
