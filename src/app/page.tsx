@@ -4,12 +4,13 @@ import React, { useState, useEffect } from "react";
 import Dashboard from "../components/Dashboard";
 import { useInitData, User } from "@telegram-apps/sdk-react";
 import Image from "next/image";
-import EarnTasks from "@/components/earn-tasks";
+import EarnTasks from "@/components/Journal";
 import ReferralTab from "@/components/ReferralTab";
 import InvestorTab from "@/components/InvestorTab";
 import { authenticateUser } from "@/hooks/authenticate";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import axios from "axios";
+import Journal from "@/components/Journal";
 
 axios.defaults.baseURL = "https://api.cryptolinkeco.com";
 
@@ -88,7 +89,7 @@ const Home: React.FC = () => {
       case "cryptolink":
         return <Dashboard user={user} />;
       case "tapToEarn":
-        return <EarnTasks />;
+        return <Journal />;
       case "invite":
         return <ReferralTab user={user} />;
       case "investor":

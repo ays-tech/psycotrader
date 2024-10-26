@@ -27,7 +27,7 @@
     "**/*.ts", 
     "**/*.tsx", 
     ".next/types/**/*.ts", 
-    "src/components/earn-tasks.jsx"
+    "src/components/Journal.jsx"
   ],
   "exclude": ["node_modules"]
 }
