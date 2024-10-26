@@ -1,22 +1,35 @@
 import { LinearProgress } from "@mui/material";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Line } from 'react-chartjs-2'; // Import Chart.js for performance chart
 
 export default function Dashboard({ user }) {
   const [points, setPoints] = useState(0);
   const [readingCoin, setReadingCoin] = useState(500); // Example coin value
 
   useEffect(() => {
-    // Mock fetch points from API or localStorage
     const storedPoints = parseInt(localStorage.getItem("points") || "0");
     setPoints(storedPoints);
   }, []);
 
-  // Handle goal progress
-  const userGoalProgress = (points / 1000) * 100; // Example calculation
+  // Example data for performance chart
+  const performanceData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], // Months
+    datasets: [
+      {
+        label: 'Trading Performance',
+        data: [0, 100, 200, 300, 400, points], // Example data
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  const userGoalProgress = (points / 1000) * 100;
 
   return (
-    <div className="h-[85vh] flex flex-col justify-between overflow-auto px-5 pt-3">
+    <div className="h-[85vh] flex flex-col justify-between overflow-auto px-5 pt-3 bg-gray-900 text-white">
       {/* Header */}
       <div className="flex justify-between items-center rounded-lg bg-[#002247] py-3 px-4">
         <div className="flex items-center w-1/3">
@@ -25,6 +38,12 @@ export default function Dashboard({ user }) {
           </div>
           <div className="truncate ml-2">Welcome, {user?.first_name || "Trader"}!</div>
         </div>
+      </div>
+
+      {/* Performance Chart */}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold text-slate-300">Trading Performance</h3>
+        <Line data={performanceData} options={{ responsive: true }} />
       </div>
 
       {/* Goal Progress */}
@@ -42,7 +61,6 @@ export default function Dashboard({ user }) {
       <div className="mt-8">
         <h3 className="text-lg font-semibold text-slate-300">Recent Signals</h3>
         <div className="space-y-3 mt-3">
-          {/* Signal Item */}
           <div className="flex justify-between items-center bg-[#232e3c] rounded-lg p-3">
             <div className="flex items-center gap-2">
               <Image src="/coin.png" width={20} height={20} alt="coin" />
@@ -50,7 +68,6 @@ export default function Dashboard({ user }) {
             </div>
             <span className="text-green-400">Buy Signal</span>
           </div>
-          {/* Additional signal items can be added similarly */}
         </div>
       </div>
 
@@ -58,20 +75,6 @@ export default function Dashboard({ user }) {
       <div className="mt-8">
         <h3 className="text-lg font-semibold text-slate-300">Trading Mindset Reminder</h3>
         <p className="text-sm text-slate-400 mt-3">Discipline is the key to successful trading. Stay focused on your goals.</p>
-      </div>
-
-      {/* Coin and Boost Buttons */}
-      <div className="flex justify-between items-center text-sm mt-8">
-        {/* Coin Count */}
-        <div className="flex items-center gap-1">
-          <Image src="/coin.png" width={20} height={20} alt="coin" />
-          <span className="text-yellow-300 font-bold">{readingCoin} Coins</span>
-        </div>
-        {/* Boost Button */}
-        <div className="flex items-center gap-3 rounded-full bg-[#2A522B] px-4 py-2">
-          <Image src="/rocket.svg" width={20} height={20} alt="rocket" />
-          <span>Boost</span>
-        </div>
       </div>
     </div>
   );
