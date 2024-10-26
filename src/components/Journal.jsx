@@ -18,6 +18,7 @@ export default function Journal() {
     remarks: "",
     tradingType: "crypto", // Default trading type
   });
+  const [selectedEntry, setSelectedEntry] = useState(null);
 
   useEffect(() => {
     const savedEntries = JSON.parse(localStorage.getItem("journalEntries")) || [];
@@ -25,9 +26,27 @@ export default function Journal() {
   }, []);
 
   const handleSave = () => {
+    if (
+      !newEntry.instrument ||
+      !newEntry.lotSize ||
+      !newEntry.entryPrice ||
+      !newEntry.exitPrice ||
+      !newEntry.stopLoss ||
+      !newEntry.takeProfit ||
+      !newEntry.profitLoss
+    ) {
+      alert("Please fill in all fields before saving.");
+      return;
+    }
+
     const updatedEntries = [...entries, { ...newEntry, id: Date.now() }];
     setEntries(updatedEntries);
     localStorage.setItem("journalEntries", JSON.stringify(updatedEntries));
+    resetNewEntry();
+    setShowForm(false);
+  };
+
+  const resetNewEntry = () => {
     setNewEntry({
       date: new Date().toLocaleDateString(),
       instrument: "",
@@ -43,7 +62,14 @@ export default function Journal() {
       remarks: "",
       tradingType: "crypto",
     });
-    setShowForm(false);
+  };
+
+  const handleEntryClick = (entry) => {
+    setSelectedEntry(entry);
+  };
+
+  const handleCloseDetails = () => {
+    setSelectedEntry(null);
   };
 
   return (
@@ -66,7 +92,11 @@ export default function Journal() {
         ) : (
           <div className="space-y-3 mt-3">
             {entries.map((entry) => (
-              <div key={entry.id} className="bg-[#232e3c] rounded-lg p-3">
+              <div
+                key={entry.id}
+                className="bg-[#232e3c] rounded-lg p-3 cursor-pointer"
+                onClick={() => handleEntryClick(entry)}
+              >
                 <div className="text-slate-300">{entry.instrument}</div>
                 <div className="flex justify-between mt-1">
                   <span className="text-sm text-slate-400">{entry.date}</span>
@@ -178,16 +208,38 @@ export default function Journal() {
             onClick={handleSave}
             className="mt-3 p-2 bg-green-500 rounded-lg"
           >
-            View Journal
+            Save
           </button>
         </div>
       )}
-      <button
-        onClick={() => setShowForm(!showForm)}
-        className="mt-4 p-2 bg-blue-500 rounded-lg"
-      >
-        {showForm ? "Cancel" : "Add New Journal Entry"}
-      </button>
+
+      {/* Selected Journal Entry Details */}
+      {selectedEntry && (
+        <div className="mt-4 p-4 bg-[#232e3c] rounded-lg">
+          <h3 className="text-lg font-semibold">Journal Entry Details</h3>
+          <div className="mt-2">
+            <p><strong>Instrument:</strong> {selectedEntry.instrument}</p>
+            <p><strong>Date:</strong> {selectedEntry.date}</p>
+            <p><strong>Lot Size:</strong> {selectedEntry.lotSize}</p>
+            <p><strong>Position:</strong> {selectedEntry.longShort}</p>
+            <p><strong>Entry Price:</strong> {selectedEntry.entryPrice}</p>
+            <p><strong>Exit Price:</strong> {selectedEntry.exitPrice}</p>
+            <p><strong>Stop Loss:</strong> {selectedEntry.stopLoss}</p>
+            <p><strong>Take Profit:</strong> {selectedEntry.takeProfit}</p>
+            <p><strong>Profit/Loss:</strong> {selectedEntry.profitLoss}</p>
+            <p><strong>Improvements:</strong> {selectedEntry.improvements}</p>
+            <p><strong>Emotions:</strong> {selectedEntry.emotions}</p>
+            <p><strong>Remarks:</strong> {selectedEntry.remarks}</p>
+            <p><strong>Trading Type:</strong> {selectedEntry.tradingType}</p>
+          </div>
+          <button
+            onClick={handleCloseDetails}
+            className="mt-3 p-2 bg-red-500 rounded-lg"
+          >
+            Close
+          </button>
+        </div>
+      )}
     </div>
   );
 }
