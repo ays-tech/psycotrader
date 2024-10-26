@@ -2,6 +2,18 @@ import { LinearProgress } from "@mui/material";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Line } from 'react-chartjs-2'; // Import Chart.js for performance chart
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+// Register the necessary components
+Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
 export default function Dashboard({ user }) {
   const [points, setPoints] = useState(0);
