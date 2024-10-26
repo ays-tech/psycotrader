@@ -1,23 +1,11 @@
 import { useEffect, useState } from "react";
+import JournalForm from "./JournalForm";
+import JournalEntry from "./JournalEntry";
 
 export default function Journal() {
   const [entries, setEntries] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [newEntry, setNewEntry] = useState({
-    date: new Date().toLocaleDateString(),
-    instrument: "",
-    lotSize: "",
-    longShort: "long", // Default to Long
-    entryPrice: "",
-    exitPrice: "",
-    stopLoss: "",
-    takeProfit: "",
-    profitLoss: "",
-    improvements: "",
-    emotions: "neutral",
-    remarks: "",
-    tradingType: "crypto", // Default trading type
-  });
+  const [editingEntry, setEditingEntry] = useState(null);
   const [selectedEntry, setSelectedEntry] = useState(null);
 
   useEffect(() => {
@@ -25,43 +13,32 @@ export default function Journal() {
     setEntries(savedEntries);
   }, []);
 
-  const handleSave = () => {
-    if (
-      !newEntry.instrument ||
-      !newEntry.lotSize ||
-      !newEntry.entryPrice ||
-      !newEntry.exitPrice ||
-      !newEntry.stopLoss ||
-      !newEntry.takeProfit ||
-      !newEntry.profitLoss
-    ) {
-      alert("Please fill in all fields before saving.");
-      return;
-    }
-
+  const handleSave = (newEntry) => {
     const updatedEntries = [...entries, { ...newEntry, id: Date.now() }];
     setEntries(updatedEntries);
     localStorage.setItem("journalEntries", JSON.stringify(updatedEntries));
-    resetNewEntry();
     setShowForm(false);
   };
 
-  const resetNewEntry = () => {
-    setNewEntry({
-      date: new Date().toLocaleDateString(),
-      instrument: "",
-      lotSize: "",
-      longShort: "long",
-      entryPrice: "",
-      exitPrice: "",
-      stopLoss: "",
-      takeProfit: "",
-      profitLoss: "",
-      improvements: "",
-      emotions: "neutral",
-      remarks: "",
-      tradingType: "crypto",
-    });
+  const handleEdit = (entry) => {
+    setEditingEntry(entry);
+    setShowForm(true);
+  };
+
+  const handleUpdate = (updatedEntry) => {
+    const updatedEntries = entries.map((entry) =>
+      entry.id === updatedEntry.id ? updatedEntry : entry
+    );
+    setEntries(updatedEntries);
+    localStorage.setItem("journalEntries", JSON.stringify(updatedEntries));
+    setEditingEntry(null);
+    setShowForm(false);
+  };
+
+  const handleDelete = (id) => {
+    const updatedEntries = entries.filter((entry) => entry.id !== id);
+    setEntries(updatedEntries);
+    localStorage.setItem("journalEntries", JSON.stringify(updatedEntries));
   };
 
   const handleEntryClick = (entry) => {
@@ -75,6 +52,12 @@ export default function Journal() {
   return (
     <div className="h-[85vh] flex flex-col justify-between overflow-auto px-5 pt-3 bg-gray-900 text-white">
       <h2 className="text-2xl font-semibold mb-4">Trading Journal</h2>
+      <button
+        onClick={() => setShowForm(true)}
+        className="mb-4 p-2 bg-green-500 rounded-lg"
+      >
+        Add Journal
+      </button>
 
       {/* Journal Entries List */}
       <div className="overflow-auto mb-4">
@@ -82,135 +65,32 @@ export default function Journal() {
         {entries.length === 0 ? (
           <div className="flex justify-center items-center h-32">
             <span className="text-slate-400">No journal entries found.</span>
-            <button
-              onClick={() => setShowForm(true)}
-              className="ml-2 p-2 bg-green-500 rounded-lg"
-            >
-              <span>🖊️</span> Add Journal
-            </button>
           </div>
         ) : (
           <div className="space-y-3 mt-3">
             {entries.map((entry) => (
-              <div
+              <JournalEntry
                 key={entry.id}
-                className="bg-[#232e3c] rounded-lg p-3 cursor-pointer"
-                onClick={() => handleEntryClick(entry)}
-              >
-                <div className="text-slate-300">{entry.instrument}</div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-sm text-slate-400">{entry.date}</span>
-                  <span className="text-sm text-slate-400">{entry.profitLoss}</span>
-                </div>
-              </div>
+                entry={entry}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onClick={handleEntryClick}
+              />
             ))}
           </div>
         )}
       </div>
 
-      {/* Add Journal Entry Form */}
+      {/* Add/Edit Journal Entry Form */}
       {showForm && (
-        <div className="mt-4 p-4 bg-[#232e3c] rounded-lg">
-          <h3 className="text-lg font-semibold">New Journal Entry</h3>
-          <input
-            type="text"
-            placeholder="Instrument"
-            value={newEntry.instrument}
-            onChange={(e) => setNewEntry({ ...newEntry, instrument: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
-          />
-          <input
-            type="number"
-            placeholder="Lot Size"
-            value={newEntry.lotSize}
-            onChange={(e) => setNewEntry({ ...newEntry, lotSize: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
-          />
-          <select
-            value={newEntry.longShort}
-            onChange={(e) => setNewEntry({ ...newEntry, longShort: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
-          >
-            <option value="long">Long</option>
-            <option value="short">Short</option>
-          </select>
-          <input
-            type="number"
-            placeholder="Entry Price"
-            value={newEntry.entryPrice}
-            onChange={(e) => setNewEntry({ ...newEntry, entryPrice: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
-          />
-          <input
-            type="number"
-            placeholder="Exit Price"
-            value={newEntry.exitPrice}
-            onChange={(e) => setNewEntry({ ...newEntry, exitPrice: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
-          />
-          <input
-            type="number"
-            placeholder="Stop Loss"
-            value={newEntry.stopLoss}
-            onChange={(e) => setNewEntry({ ...newEntry, stopLoss: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
-          />
-          <input
-            type="number"
-            placeholder="Take Profit"
-            value={newEntry.takeProfit}
-            onChange={(e) => setNewEntry({ ...newEntry, takeProfit: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
-          />
-          <input
-            type="text"
-            placeholder="Profit/Loss"
-            value={newEntry.profitLoss}
-            onChange={(e) => setNewEntry({ ...newEntry, profitLoss: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
-          />
-          <textarea
-            placeholder="Improvements"
-            value={newEntry.improvements}
-            onChange={(e) => setNewEntry({ ...newEntry, improvements: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg resize-none"
-            rows={3}
-          />
-          <select
-            value={newEntry.emotions}
-            onChange={(e) => setNewEntry({ ...newEntry, emotions: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
-          >
-            <option value="neutral">Select Emotion</option>
-            <option value="happy">Happy</option>
-            <option value="sad">Sad</option>
-            <option value="frustrated">Frustrated</option>
-            <option value="confident">Confident</option>
-            <option value="anxious">Anxious</option>
-          </select>
-          <textarea
-            placeholder="Remarks"
-            value={newEntry.remarks}
-            onChange={(e) => setNewEntry({ ...newEntry, remarks: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg resize-none"
-            rows={3}
-          />
-          <select
-            value={newEntry.tradingType}
-            onChange={(e) => setNewEntry({ ...newEntry, tradingType: e.target.value })}
-            className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
-          >
-            <option value="crypto">Crypto</option>
-            <option value="forex">Forex</option>
-            <option value="stocks">Stocks</option>
-          </select>
-          <button
-            onClick={handleSave}
-            className="mt-3 p-2 bg-green-500 rounded-lg"
-          >
-            Save
-          </button>
-        </div>
+        <JournalForm
+          entry={editingEntry}
+          onSave={editingEntry ? handleUpdate : handleSave}
+          onClose={() => {
+            setShowForm(false);
+            setEditingEntry(null);
+          }}
+        />
       )}
 
       {/* Selected Journal Entry Details */}
@@ -240,6 +120,183 @@ export default function Journal() {
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+// JournalForm.js
+function JournalForm({ entry, onSave, onClose }) {
+  const [formData, setFormData] = useState({
+    date: entry ? entry.date : new Date().toLocaleDateString(),
+    instrument: entry ? entry.instrument : "",
+    lotSize: entry ? entry.lotSize : "",
+    longShort: entry ? entry.longShort : "long",
+    entryPrice: entry ? entry.entryPrice : "",
+    exitPrice: entry ? entry.exitPrice : "",
+    stopLoss: entry ? entry.stopLoss : "",
+    takeProfit: entry ? entry.takeProfit : "",
+    profitLoss: entry ? entry.profitLoss : "",
+    improvements: entry ? entry.improvements : "",
+    emotions: entry ? entry.emotions : "neutral",
+    remarks: entry ? entry.remarks : "",
+    tradingType: entry ? entry.tradingType : "crypto",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSave = () => {
+    if (
+      !formData.instrument ||
+      !formData.lotSize ||
+      !formData.entryPrice ||
+      !formData.exitPrice ||
+      !formData.stopLoss ||
+      !formData.takeProfit ||
+      !formData.profitLoss
+    ) {
+      alert("Please fill in all fields before saving.");
+      return;
+    }
+
+    onSave({ ...formData, id: entry ? entry.id : Date.now() });
+  };
+
+  return (
+    <div className="mt-4 p-4 bg-[#232e3c] rounded-lg">
+      <h3 className="text-lg font-semibold">{entry ? "Edit" : "New"} Journal Entry</h3>
+      <input
+        name="instrument"
+        type="text"
+        placeholder="Instrument"
+        value={formData.instrument}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      />
+      <input
+        name="lotSize"
+        type="number"
+        placeholder="Lot Size"
+        value={formData.lotSize}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      />
+      <select
+        name="longShort"
+        value={formData.longShort}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      >
+        <option value="long">Long</option>
+        <option value="short">Short</option>
+      </select>
+      <input
+        name="entryPrice"
+        type="number"
+        placeholder="Entry Price"
+        value={formData.entryPrice}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      />
+      <input
+        name="exitPrice"
+        type="number"
+        placeholder="Exit Price"
+        value={formData.exitPrice}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      />
+      <input
+        name="stopLoss"
+        type="number"
+        placeholder="Stop Loss"
+        value={formData.stopLoss}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      />
+      <input
+        name="takeProfit"
+        type="number"
+        placeholder="Take Profit"
+        value={formData.takeProfit}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      />
+      <input
+        name="profitLoss"
+        type="text"
+        placeholder="Profit/Loss"
+        value={formData.profitLoss}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      />
+      <textarea
+        name="improvements"
+        placeholder="Improvements"
+        value={formData.improvements}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      />
+      <textarea
+        name="emotions"
+        placeholder="Emotions"
+        value={formData.emotions}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      />
+      <textarea
+        name="remarks"
+        placeholder="Remarks"
+        value={formData.remarks}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      />
+      <select
+        name="tradingType"
+        value={formData.tradingType}
+        onChange={handleChange}
+        className="mt-2 p-2 w-full bg-gray-800 rounded-lg"
+      >
+        <option value="crypto">Crypto</option>
+        <option value="forex">Forex</option>
+        <option value="stocks">Stocks</option>
+      </select>
+
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={handleSave}
+          className="p-2 bg-blue-500 rounded-lg"
+        >
+          Save
+        </button>
+        <button
+          onClick={onClose}
+          className="p-2 bg-red-500 rounded-lg"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// JournalEntry.js
+export default function JournalEntry({ entry, onEdit, onDelete, onClick }) {
+  return (
+    <div
+      className="p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700"
+      onClick={() => onClick(entry)}
+    >
+      <h4 className="font-semibold">{entry.instrument}</h4>
+      <p>Date: {entry.date}</p>
+      <p>Lot Size: {entry.lotSize}</p>
+      <p>Position: {entry.longShort}</p>
+      <div className="flex justify-between mt-2">
+        <button onClick={(e) => { e.stopPropagation(); onEdit(entry); }} className="text-yellow-500">Edit</button>
+        <button onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }} className="text-red-500">Delete</button>
+      </div>
     </div>
   );
 }
