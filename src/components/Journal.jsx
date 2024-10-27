@@ -57,17 +57,11 @@ export default function Journal() {
   };
 
   return (
-    <div className="h-[85vh] flex flex-col justify-between overflow-auto px-5 pt-3 bg-gray-900 text-white">
+    <div className="h-[85vh] flex flex-col justify-between overflow-auto px-5 pt-3 bg-gray-900 text-white relative">
       <h2 className="text-2xl font-semibold mb-4">Trading Journal</h2>
-      <button
-        onClick={() => setShowForm(true)}
-        className="mb-4 p-2 bg-green-500 rounded-lg"
-      >
-        Add Journal
-      </button>
 
       {/* Journal Entries List */}
-      <div className="overflow-auto mb-4">
+      <div className="overflow-auto mb-4 flex-grow">
         <h3 className="text-lg font-semibold">Your Entries</h3>
         {entries.length === 0 ? (
           <div className="flex justify-center items-center h-32">
@@ -127,6 +121,15 @@ export default function Journal() {
           </button>
         </div>
       )}
+
+      {/* Add Journal Button */}
+      <button
+        onClick={() => setShowForm(true)}
+        className="absolute bottom-4 right-4 p-3 bg-green-500 rounded-full shadow-lg flex items-center justify-center"
+        title="Add Journal Entry"
+      >
+        <span className="text-2xl">✏️</span> {/* Replace with your desired pen icon */}
+      </button>
     </div>
   );
 }

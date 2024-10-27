@@ -48,7 +48,7 @@ const Home: React.FC = () => {
   const tabs = [
     {
       id: "cryptolink",
-      text: "Cryptolink",
+      text: "Dashboard",
       Icon: () => (
         <div className="w-7">
           <Image src="/coin.png" alt="" width={100} height={100} priority />

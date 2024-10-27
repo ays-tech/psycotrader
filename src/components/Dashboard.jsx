@@ -1,8 +1,5 @@
-import { LinearProgress } from "@mui/material";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { Line } from 'react-chartjs-2';
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'; 
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import { useEffect, useState } from 'react';
 import {
   Chart,
   CategoryScale,
@@ -17,78 +14,125 @@ Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, L
 
 export default function Dashboard({ user }) {
   const [points, setPoints] = useState(0);
+  const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
   useEffect(() => {
     const storedPoints = parseInt(localStorage.getItem("points") || "0");
     setPoints(storedPoints);
   }, []);
 
-  const performanceData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Trading Performance',
-        data: [0, 100, 200, 300, 400, points],
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderWidth: 2,
-      },
-    ],
-  };
+  useEffect(() => {
+    const tips = [
+      "Stay disciplined and stick to your trading plan!",
+      "Use stop-loss orders to protect your capital.",
+      "Diversify your portfolio to manage risk.",
+      "Keep emotions in check; trading is not gambling.",
+      "Learn to read charts to identify trends.",
+    ];
+
+    // Change tip every 5 seconds
+    const interval = setInterval(() => {
+      setCurrentTipIndex((prevIndex) => (prevIndex + 1) % tips.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const userGoalProgress = (points / 1000) * 100;
 
+  // Example data for Market Sentiment
+  const marketSentiments = [
+    { asset: 'BTC', sentiment: 'Bullish' },
+    { asset: 'ETH', sentiment: 'Neutral' },
+    { asset: 'ADA', sentiment: 'Bearish' },
+  ];
+
+  // Example data for Top Gainers and Losers
+  const topMovers = {
+    gainers: [{ asset: 'ETH', change: '+8%' }, { asset: 'ADA', change: '+5%' }],
+    losers: [{ asset: 'SOL', change: '-3%' }, { asset: 'DOT', change: '-2%' }],
+  };
+
   return (
-    <div className="h-auto flex flex-col overflow-auto px-4 py-5 bg-gray-900 text-white sm:px-6 lg:px-8">
-      {/* Trading Mindset Reminder */}
-      <div className="flex flex-col items-start bg-[#002247] rounded-lg py-4 px-4 mb-4 shadow-md">
-        <h3 className="text-lg font-semibold text-slate-300">Trading Mindset Reminder</h3>
-        <p className="text-sm text-slate-400 mt-3">Discipline is the key to successful trading. Stay focused on your goals.</p>
+    <div className="h-auto flex flex-col justify-between overflow-auto px-4 py-5 bg-gray-900 text-white sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="flex flex-col items-start mb-6">
+        <div className="flex items-center w-full bg-[#002247] rounded-lg py-4 px-4">
+          <div className="w-10 h-10 bg-[#232e3c] rounded-full flex items-center justify-center text-2xl text-green-400">
+            {user?.first_name?.slice(0, 1)}
+          </div>
+          <div className="truncate ml-2 text-lg font-semibold">Welcome, {user?.first_name || "Trader"}!</div>
+        </div>
       </div>
 
-      {/* User Welcome */}
-      <div className="flex items-center w-full bg-[#002247] rounded-lg py-3 px-4 mb-4 shadow-md">
-        <div className="w-10 h-10 bg-[#232e3c] rounded-full flex items-center justify-center text-2xl text-green-400">
-          {user?.first_name?.slice(0, 1)}
+      {/* Tip of the Day */}
+      <div className="flex flex-col items-start mt-6">
+        <h3 className="text-lg font-semibold text-slate-300">Tip of the Day</h3>
+        <div className="bg-[#232e3c] p-4 rounded-lg shadow-md mt-2">
+          <p className="text-sm text-slate-400">{["Stay disciplined and stick to your trading plan!", "Use stop-loss orders to protect your capital.", "Diversify your portfolio to manage risk.", "Keep emotions in check; trading is not gambling.", "Learn to read charts to identify trends."][currentTipIndex]}</p>
         </div>
-        <div className="truncate ml-2 text-lg font-semibold">Welcome, {user?.first_name || "Trader"}!</div>
       </div>
 
       {/* Goal Progress */}
-      <div className="flex flex-col items-center bg-[#1a202c] rounded-lg py-4 px-4 mb-6 shadow-md">
+      <div className="mt-6">
         <h3 className="text-lg font-semibold text-slate-300">Current Goal</h3>
-        <p className="text-sm text-slate-400 mt-1">Your progress towards achieving your goal</p>
-        <div className="mt-4" style={{ width: 100, height: 100 }}>
-          <CircularProgressbar
-            value={userGoalProgress}
-            text={`${Math.round(userGoalProgress)}%`}
-            styles={buildStyles({
-              pathColor: '#4caf50',
-              textColor: '#fff',
-              trailColor: '#3e3e3e',
-            })}
-          />
+        <p className="text-sm text-slate-400">Your progress towards achieving your goal</p>
+        <div className="flex items-center justify-center mt-4">
+          <div style={{ width: 100, height: 100 }}>
+            <CircularProgressbar
+              value={userGoalProgress}
+              text={`${Math.round(userGoalProgress)}%`}
+              styles={buildStyles({
+                pathColor: '#4caf50', 
+                textColor: '#fff', 
+                trailColor: '#3e3e3e',
+              })}
+            />
+          </div>
+          <div className="ml-4 flex flex-col">
+            <p className="text-sm text-slate-400">Points Earned: {points}</p>
+            <p className="text-sm text-slate-400">Goal: 1000 Points</p>
+          </div>
         </div>
       </div>
 
-      {/* Grid Layout for Performance Chart and Recent Signals */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        {/* Performance Chart */}
-        <div className="bg-[#1a202c] rounded-lg p-4 shadow-md">
-          <h3 className="text-lg font-semibold text-slate-300 mb-2">Trading Performance</h3>
-          <Line data={performanceData} options={{ responsive: true }} />
-        </div>
+      {/* Market Sentiment Indicator */}
+      <div className="mt-8">
+        <h3 className="text-lg font-semibold text-slate-300">Market Sentiments</h3>
+        {marketSentiments.map((market, index) => (
+          <div key={index} className="bg-[#232e3c] p-4 rounded-lg shadow-md flex items-center justify-between mb-2">
+            <span className="text-slate-300">{market.asset}</span>
+            <span className={`text-lg font-bold ${market.sentiment === 'Bullish' ? 'text-green-400' : market.sentiment === 'Bearish' ? 'text-red-400' : 'text-yellow-400'}`}>
+              {market.sentiment}
+            </span>
+          </div>
+        ))}
+      </div>
 
-        {/* Recent Signals */}
-        <div className="bg-[#1a202c] rounded-lg p-4 shadow-md">
-          <h3 className="text-lg font-semibold text-slate-300 mb-3">Recent Signals</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center bg-[#232e3c] rounded-lg p-3 shadow-md">
-              <div className="flex items-center gap-2">
-                <Image src="/coin.png" width={20} height={20} alt="coin" />
-                <span className="text-slate-300">BTC/USDT</span>
-              </div>
-              <span className="text-green-400">Buy Signal</span>
+      {/* Top Gainers and Losers */}
+      <div className="mt-8">
+        <h3 className="text-lg font-semibold text-slate-300">Top Gainers & Losers</h3>
+        <div className="flex mt-4 gap-4">
+          <div className="w-1/2">
+            <h4 className="text-md font-semibold text-green-400">Gainers</h4>
+            <div className="bg-[#232e3c] p-3 rounded-lg space-y-2">
+              {topMovers.gainers.map((gainer, index) => (
+                <div key={index} className="flex justify-between text-slate-300">
+                  <span>{gainer.asset}</span>
+                  <span className="text-green-400">{gainer.change}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="w-1/2">
+            <h4 className="text-md font-semibold text-red-400">Losers</h4>
+            <div className="bg-[#232e3c] p-3 rounded-lg space-y-2">
+              {topMovers.losers.map((loser, index) => (
+                <div key={index} className="flex justify-between text-slate-300">
+                  <span>{loser.asset}</span>
+                  <span className="text-red-400">{loser.change}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
